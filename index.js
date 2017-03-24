@@ -9,7 +9,7 @@ module.exports = treemline = {
     if (prefn) {
       prefn(tree);
     }
-    for (i in tree) {
+    for (var i in tree) {
       treemline.visit(tree[i], prefn, postfn);
     }
     if (postfn) {
@@ -25,7 +25,7 @@ module.exports = treemline = {
       tree,
       function(_tree) {
         if (!filter(_tree)) {
-          for (i in _tree) {
+          for (var i in _tree) {
             delete _tree[i];
           }
         }
@@ -40,10 +40,13 @@ module.exports = treemline = {
       tree,
       function(_tree) {
         if (!filter(_tree)) {
-          for (i in _tree) {
+          for (var i in _tree) {
             _tree[i] = mapper(_tree[i]);
           }
         }
     });
+  },
+  hasCycle: function(tree) {
+    return true;
   }
 }
