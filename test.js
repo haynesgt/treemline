@@ -26,7 +26,7 @@ describe("treemline", function() {
           function(tree) {
             revNodes.push(tree);
           });
-      expect(nodes).toEqual(testTreeOrder0);
+      expect(nodes.slice().sort()).toEqual(testTreeOrder0.slice().sort());
       // expect(revNodes.reverse()).toEqual(testTreeOrder0);
     });
   });
