@@ -1,25 +1,32 @@
-// version 0.1.0 -- not efficient -- no tests
+// version 0.1.0 -- not efficient -- no tests / broken tests -- unstable
 
 var treemline;
 
 module.exports = treemline = {
-  visit: function(tree, prefn, postfn) {
+  visit_STOP: "visit_STOP", // visit no more nodes and do not do postfn
+  visit_SKIP: "visit_SKIP", // do not visit subtree and do not do postfn
+  visit_CONTINUE: null, // falsy means visit subtree and do postfn
+  visit: function(node, prefn, postfn, tree, path) {
     // untested
     // unsafe -- does not check cycles
+    if (tree == undefined) tree = node;
+    if (path == undefined) path = [];
     if (prefn) {
-      // return true to stop
-      if (prefn(tree)) {
-        return true;
+      var action = prefn(node, tree, path));
+      if (action) {
+        return action;
       }
     }
     for (var i in tree) {
-      if (treemline.visit(tree[i], prefn, postfn)) {
-        return true;
+      var action = treemline.visit(tree[i], prefn, postfn, tree, path.concat([i]));
+      if (action === treemline.visit_STOP) {
+        return treemline.visit_STOP;
       }
     }
     if (postfn) {
-      if (postfn(tree)) {
-        return true;
+      var action = postfn(node, tree, path));
+      if (action) {
+        return action;
       }
     }
     return false;
