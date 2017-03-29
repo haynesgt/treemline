@@ -7,14 +7,22 @@ module.exports = treemline = {
     // untested
     // unsafe -- does not check cycles
     if (prefn) {
-      prefn(tree);
+      // return true to stop
+      if (prefn(tree)) {
+        return true;
+      }
     }
     for (var i in tree) {
-      treemline.visit(tree[i], prefn, postfn);
+      if (treemline.visit(tree[i], prefn, postfn)) {
+        return true;
+      }
     }
     if (postfn) {
-      postfn(tree);
+      if (postfn(tree)) {
+        return true;
+      }
     }
+    return false;
   },
   prune: function(tree, filter) {
     // removes subtrees where filter(tree) returns false
@@ -47,6 +55,12 @@ module.exports = treemline = {
     });
   },
   hasCycle: function(tree) {
-    return true;
+    // returns true if tree has a cylce, false otherwise
+    var nodes = [];
+    var cylceFinder = (x) => {
+      if (nodes.find(x)) return true;
+      nodes.push(x);
+    }
+    return !!treemline.visit(cycleFinder);
   }
 }
