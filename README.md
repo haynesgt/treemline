@@ -1,2 +1,2 @@
-# treemline
+# Treemline
 Algorithms for Trees
