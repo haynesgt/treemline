@@ -1,4 +1,4 @@
-// version 0.1.0 -- not efficient -- no tests / broken tests -- unstable
+// version 0.1.0 -- not efficient -- no tests / broken tests -- unstable -- no type safety
 
 var treemline;
 
@@ -6,25 +6,25 @@ module.exports = treemline = {
   visit_STOP: "visit_STOP", // visit no more nodes and do not do postfn
   visit_SKIP: "visit_SKIP", // do not visit subtree and do not do postfn
   visit_CONTINUE: null, // falsy means visit subtree and do postfn
-  visit: function(node, prefn, postfn, tree, path) {
+  visit: function(node, enterFn, exitFn, tree, path) {
     // untested
     // unsafe -- does not check cycles
     if (tree == undefined) tree = node;
     if (path == undefined) path = [];
-    if (prefn) {
-      var action = prefn(node, tree, path));
+    if (enterFn) {
+      var action = enterFn(node, tree, path));
       if (action) {
         return action;
       }
     }
     for (var i in tree) {
-      var action = treemline.visit(tree[i], prefn, postfn, tree, path.concat([i]));
+      var action = treemline.visit(tree[i], enterFn, exitFn, tree, path.concat([i]));
       if (action === treemline.visit_STOP) {
         return treemline.visit_STOP;
       }
     }
-    if (postfn) {
-      var action = postfn(node, tree, path));
+    if (exitFn) {
+      var action = exitFn(node, tree, path));
       if (action) {
         return action;
       }
@@ -69,5 +69,32 @@ module.exports = treemline = {
       nodes.push(x);
     }
     return !!treemline.visit(cycleFinder);
+  },
+  flatten: function(tree) {
+    // converts all leafs to an array like [{path: [key list], leaf: any}, ...]
+    var flatTree = [];
+    treemline.visit(tree, function(node, tree, path) {
+      if (Object.keys(node).length === 0) {
+        flatTree.push({path: path, node: node});
+      }
+    });
+    return flatTree;
+  },
+  deflatten: function(flatTree) {
+    var tree = {};
+    for (var i in flatTree) {
+      var node = flatTree[i];
+      var nodeJ = tree;
+      for (var j in node.path) {
+        if (nodeJ.j === undefined) {
+          if (j === node.path.length - 1) {
+            nodeJ.J = node;
+          } else {
+            nodeJ.j = {};
+          }
+        }
+      }
+    }
+    return tree;
   }
 }
