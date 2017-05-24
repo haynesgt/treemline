@@ -7,7 +7,6 @@ module.exports = treemline = {
   visit_SKIP: "visit_SKIP", // do not visit subtree and do not do postfn
   visit_CONTINUE: null, // falsy means visit subtree and do postfn
   visit: function(node, enterFn, exitFn, tree, path) {
-    console.log("Visiting " + node);
     // untested
     // unsafe -- does not check cycles
     if (tree == undefined) tree = node;
