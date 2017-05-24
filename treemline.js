@@ -1,4 +1,4 @@
-// version 0.1.0 -- not efficient -- no tests / broken tests -- unstable -- no type safety
+// version 0.1.1 -- not efficient -- no tests / broken tests -- unstable -- no type safety
 
 var treemline;
 
@@ -7,24 +7,33 @@ module.exports = treemline = {
   visit_SKIP: "visit_SKIP", // do not visit subtree and do not do postfn
   visit_CONTINUE: null, // falsy means visit subtree and do postfn
   visit: function(node, enterFn, exitFn, tree, path) {
+    console.log("Visiting " + node);
     // untested
     // unsafe -- does not check cycles
     if (tree == undefined) tree = node;
     if (path == undefined) path = [];
     if (enterFn) {
-      var action = enterFn(node, tree, path));
+      var action = enterFn(node, tree, path);
       if (action) {
         return action;
       }
     }
-    for (var i in tree) {
-      var action = treemline.visit(tree[i], enterFn, exitFn, tree, path.concat([i]));
-      if (action === treemline.visit_STOP) {
-        return treemline.visit_STOP;
+    if (typeof node !== "string") {
+      for (var i in node) {
+        var action = treemline.visit(
+          node[i],
+          enterFn,
+          exitFn,
+          tree,
+          path.concat([i])
+        );
+        if (action === treemline.visit_STOP) {
+          return treemline.visit_STOP;
+        }
       }
     }
     if (exitFn) {
-      var action = exitFn(node, tree, path));
+      var action = exitFn(node, tree, path);
       if (action) {
         return action;
       }
@@ -64,17 +73,21 @@ module.exports = treemline = {
   hasCycle: function(tree) {
     // returns true if tree has a cylce, false otherwise
     var nodes = [];
-    var cylceFinder = (x) => {
+    var cylceFinder = function(x) {
       if (nodes.find(x)) return true;
       nodes.push(x);
-    }
+    };
     return !!treemline.visit(cycleFinder);
   },
-  flatten: function(tree) {
+  flatten: function(tree, config) {
     // converts all leafs to an array like [{path: [key list], leaf: any}, ...]
+    if (!config) config = {};
     var flatTree = [];
     treemline.visit(tree, function(node, tree, path) {
-      if (Object.keys(node).length === 0) {
+      if (node == null ||
+          Object.keys(node).length === 0 ||
+          typeof node === "string"
+      ) {
         flatTree.push({path: path, node: node});
       }
     });
@@ -97,4 +110,4 @@ module.exports = treemline = {
     }
     return tree;
   }
-}
+};
