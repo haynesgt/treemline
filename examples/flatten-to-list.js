@@ -1,3 +1,7 @@
+/*
+ * Takes a data structure and prints out all fully qualified keys and values.
+ */
+
 var tl = require("../treemline");
 
 var structure = {
