@@ -1,4 +1,4 @@
-var tl = require("./treemline");
+var tl = require("../treemline");
 
 var structure = {
   a: {
